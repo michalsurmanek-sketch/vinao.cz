@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vinao.cz – Víno, vinaři, degustace & klub</title>
+  <meta name="description" content="Vinao.cz – objev vína z Moravy i světa. Katalog vín, přehled vinařů, degustace & členství v klubu Vinao." />
+
+  <!-- Favicon (SVG inline as data URI) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='20' cy='20' r='8' fill='%237b0323'/%3E%3Ccircle cx='32' cy='16' r='8' fill='%239b1438'/%3E%3Ccircle cx='44' cy='20' r='8' fill='%237b0323'/%3E%3Ccircle cx='26' cy='30' r='8' fill='%239b1438'/%3E%3Ccircle cx='38' cy='30' r='8' fill='%237b0323'/%3E%3Cpath d='M32 6c5 0 10 2 14 6' stroke='%239b1438' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!-- Google Fonts (diakritika OK) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Montserrat', 'ui-sans-serif', 'system-ui'],
+            serif: ['Playfair Display', 'ui-serif', 'Georgia']
+          },
+          colors: {
+            vino: {
+              50: '#fdf5f7',
+              100: '#fae8ed',
+              200: '#f3c8d1',
+              300: '#e79aa9',
+              400: '#d9647e',
+              500: '#c82f57',
+              600: '#9b1438', // tmavší bordó
+              700: '#7b0323', // základní bordó
+              800: '#4c0416',
+              900: '#2a040c'
+            },
+            gold: '#d4af37'
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(0,0,0,0.08)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    /* Hide number spinners */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+  </style>
+</head>
+<body class="bg-white text-slate-900 font-sans">
+  <!-- Top bar -->
+  <header class="sticky top-0 z-50 bg-white/85 backdrop-blur border-b border-slate-200">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between py-3">
+        <!-- Logo -->
+        <a href="#home" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 grid place-items-center rounded-2xl bg-vino-700 text-white shadow-soft">
+            <!-- Grape icon -->
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="opacity-90">
+              <circle cx="8" cy="8" r="3"></circle>
+              <circle cx="12" cy="6" r="3" class="opacity-90"></circle>
+              <circle cx="16" cy="8" r="3"></circle>
+              <circle cx="10" cy="12" r="3"></circle>
+              <circle cx="14" cy="12" r="3"></circle>
+            </svg>
+          </div>
+          <div class="leading-5">
+            <div class="font-extrabold text-lg tracking-tight">Vinao<span class="text-vino-700">.cz</span></div>
+            <div class="text-xs text-slate-600 -mt-0.5">Víno • Vinaři • Degustace • Klub</div>
+          </div>
+        </a>
+
+        <!-- Desktop nav -->
+        <nav class="hidden md:flex items-center gap-6 font-medium">
+          <a href="#katalog" class="hover:text-vino-700">Katalog vín</a>
+          <a href="#vinari" class="hover:text-vino-700">Vinaři</a>
+          <a href="#akce" class="hover:text-vino-700">Akce</a>
+          <a href="#klub" class="hover:text-vino-700">Klub Vinao</a>
+          <a href="#kontakt" class="hover:text-vino-700">Kontakt</a>
+          <a href="#newsletter" class="ml-2 inline-flex items-center gap-2 rounded-full bg-vino-700 text-white px-4 py-2 text-sm hover:bg-vino-600 transition">Přihlásit odběr</a>
+        </nav>
+
+        <!-- Mobile hamburger -->
+        <button id="hamburger" class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-300 hover:border-vino-700" aria-label="Otevřít menu" aria-expanded="false">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu (portal) -->
+    <div id="mobileMenu" class="fixed inset-0 z-40 hidden">
+      <div class="absolute inset-0 bg-black/40" id="mobileBackdrop"></div>
+      <nav class="absolute right-0 top-0 h-full w-[82%] max-w-sm bg-white shadow-2xl p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between mb-2">
+          <div class="font-extrabold text-lg">Menu</div>
+          <button id="mobileClose" class="w-9 h-9 grid place-items-center rounded-lg border border-slate-300" aria-label="Zavřít menu">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <a class="py-2 text-lg" href="#katalog">Katalog vín</a>
+        <a class="py-2 text-lg" href="#vinari">Vinaři</a>
+        <a class="py-2 text-lg" href="#akce">Akce</a>
+        <a class="py-2 text-lg" href="#klub">Klub Vinao</a>
+        <a class="py-2 text-lg" href="#kontakt">Kontakt</a>
+        <a class="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-vino-700 text-white px-4 py-3 text-base hover:bg-vino-600 transition" href="#newsletter">Přihlásit odběr</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="home" class="relative overflow-hidden">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-10 items-center py-12 sm:py-16 lg:py-20">
+      <div>
+        <span class="inline-flex items-center gap-2 text-vino-700 bg-vino-50 border border-vino-100 rounded-full px-3 py-1 text-xs font-semibold">Klub Vinao • 3 vína měsíčně</span>
+        <h1 class="mt-4 font-serif text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
+          Víno, které <span class="text-vino-700">poznáš</span> po prvním doušku
+        </h1>
+        <p class="mt-4 text-slate-600 text-lg">Objev pečlivě vybraná vína z Moravy i světa. Katalog vinařů, degustace a uzavřený klub pro milovníky vína.</p>
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <a href="#katalog" class="inline-flex items-center gap-2 rounded-xl bg-vino-700 text-white px-5 py-3 text-base font-semibold shadow-soft hover:bg-vino-600 transition">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            Nakoupit víno
+          </a>
+          <a href="#vinari" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-base font-semibold hover:border-vino-700 hover:text-vino-700 transition">
+            <i data-lucide="map-pin" class="w-5 h-5"></i>
+            Objev vinaře
+          </a>
+        </div>
+        <div class="mt-6 flex items-center gap-4 text-sm text-slate-600">
+          <div class="flex -space-x-2">
+            <!-- avatar grapes as placeholders -->
+            <div class="w-8 h-8 rounded-full bg-vino-700/90 ring-2 ring-white"></div>
+            <div class="w-8 h-8 rounded-full bg-vino-600/90 ring-2 ring-white"></div>
+            <div class="w-8 h-8 rounded-full bg-vino-700/70 ring-2 ring-white"></div>
+          </div>
+          <div><span class="font-semibold">1 200+</span> spokojených členů klubu</div>
+        </div>
+      </div>
+      <div class="relative">
+        <!-- Decorative bottle/card composition -->
+        <div class="relative mx-auto max-w-md">
+          <div class="absolute -top-6 -left-6 w-28 h-28 rounded-3xl bg-vino-50 border border-vino-100"></div>
+          <div class="absolute -bottom-8 -right-8 w-32 h-32 rounded-full bg-gold/10 blur-2xl"></div>
+          <div class="relative rounded-3xl p-6 bg-white border border-slate-200 shadow-soft">
+            <div class="aspect-[3/4] rounded-2xl bg-gradient-to-b from-vino-100 to-white grid place-items-center">
+              <!-- SVG wine bottle placeholder -->
+              <svg viewBox="0 0 128 256" class="w-28 h-48" aria-hidden="true">
+                <defs>
+                  <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#9b1438"/>
+                    <stop offset="100%" stop-color="#7b0323"/>
+                  </linearGradient>
+                </defs>
+                <rect x="56" y="0" width="16" height="30" fill="#333" rx="4"/>
+                <rect x="44" y="30" width="40" height="110" fill="url(#g)" rx="8"/>
+                <rect x="40" y="140" width="48" height="80" fill="#eee" rx="10" stroke="#ddd"/>
+              </svg>
+            </div>
+            <div class="mt-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-semibold">Výběr someliéra</h3>
+                <span class="text-sm text-vino-700 font-semibold">-15% v klubu</span>
+              </div>
+              <p class="text-sm text-slate-600 mt-1">Limitovaná edice tří lahví měsíčně • doručení zdarma</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Katalog vín -->
+  <section id="katalog" class="py-12 sm:py-16 lg:py-20 bg-slate-50 border-t border-slate-200">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h2 class="font-serif text-3xl sm:text-4xl font-extrabold">Katalog vín</h2>
+          <p class="text-slate-600 mt-2">Filtrovat lze podle odrůdy, regionu, ceny a ročníku. (Demo – filtruje vzorky níže.)</p>
+        </div>
+        <div class="flex items-center gap-2 text-sm">
+          <button id="resetFilters" class="px-4 py-2 rounded-lg border border-slate-300 hover:border-vino-700 hover:text-vino-700">Vymazat filtry</button>
+        </div>
+      </div>
+
+      <!-- Filtry -->
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        <div class="col-span-2">
+          <label class="text-sm text-slate-600">Hledat</label>
+          <input id="f-q" type="text" placeholder="např. Rulandské, polosuché…" class="mt-1 w-full rounded-lg border-slate-300 focus:border-vino-700 focus:ring-vino-700" />
+        </div>
+        <div>
+          <label class="text-sm text-slate-600">Odrůda</label>
+          <select id="f-odruda" class="mt-1 w-full rounded-lg border-slate-300 focus:border-vino-700 focus:ring-vino-700">
+            <option value="">Vše</option>
+            <option>Ryzlink rýnský</option>
+            <option>Sauvignon</option>
+            <option>Veltlínské zelené</option>
+            <option>Frankovka</option>
+            <option>Rulandské modré</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm text-slate-600">Region</label>
+          <select id="f-region" class="mt-1 w-full rounded-lg border-slate-300 focus:border-vino-700 focus:ring-vino-700">
+            <option value="">Vše</option>
+            <option>Znojmo</option>
+            <option>Mikulov</option>
+            <option>Slovácko</option>
+            <option>Velké Pavlovice</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm text-slate-600">Max. cena (Kč)</label>
+          <input id="f-cena" type="number" min="0" step="50" placeholder="např. 300" class="mt-1 w-full rounded-lg border-slate-300 focus:border-vino-700 focus:ring-vino-700" />
+        </div>
+        <div>
+          <label class="text-sm text-slate-600">Min. ročník</label>
+          <input id="f-rocnik" type="number" min="1990" max="2025" step="1" placeholder="např. 2020" class="mt-1 w-full rounded-lg border-slate-300 focus:border-vino-700 focus:ring-vino-700" />
+        </div>
+      </div>
+
+      <!-- Grid vín (demo data) -->
+      <div id="wineGrid" class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+    </div>
+  </section>
+
+  <!-- Vinaři -->
+  <section id="vinari" class="py-12 sm:py-16 lg:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h2 class="font-serif text-3xl sm:text-4xl font-extrabold">Vinaři</h2>
+          <p class="text-slate-600 mt-2">Prohlédni si profily a nabídku – spojení napřímo, bez prostředníků.</p>
+        </div>
+        <a href="#kontakt" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 hover:border-vino-700 hover:text-vino-700">
+          <i data-lucide="plus"></i>
+          Přidat vinaře
+        </a>
+      </div>
+
+      <div id="wineryGrid" class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+  </section>
+
+  <!-- Akce & degustace -->
+  <section id="akce" class="py-12 sm:py-16 lg:py-20 bg-slate-50 border-y border-slate-200">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <h2 class="font-serif text-3xl sm:text-4xl font-extrabold">Akce & degustace</h2>
+      <p class="text-slate-600 mt-2">Otevřené sklepy, festivaly a večery s párováním jídel.</p>
+      <div id="eventList" class="mt-6 grid md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+    </div>
+  </section>
+
+  <!-- Klub Vinao -->
+  <section id="klub" class="py-12 sm:py-16 lg:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <h2 class="font-serif text-3xl sm:text-4xl font-extrabold">Klub Vinao – měsíční výběr</h2>
+        <p class="text-slate-700 mt-3 text-lg">Každý měsíc obdržíš 3 pečlivě vybrané lahve z Moravy i ze světa. Členové mají dopravu zdarma a přednostní přístup k limitkám.</p>
+        <ul class="mt-5 space-y-3 text-slate-700">
+          <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-vino-700"></i><span>3 lahve měsíčně + degustační karta</span></li>
+          <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-vino-700"></i><span>Slevy až 15 % na e‑shopu</span></li>
+          <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-vino-700"></i><span>Přednostní vstup na akce</span></li>
+        </ul>
+        <div class="mt-6 flex gap-3">
+          <a href="#newsletter" class="inline-flex items-center gap-2 rounded-xl bg-vino-700 text-white px-5 py-3 font-semibold hover:bg-vino-600">
+            <i data-lucide="badge-percent"></i>
+            Chci do klubu
+          </a>
+          <a href="#katalog" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-3 font-semibold hover:border-vino-700 hover:text-vino-700">Prohlédnout vína</a>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="rounded-3xl border border-slate-200 p-6 bg-white shadow-soft">
+          <div class="grid sm:grid-cols-3 gap-4">
+            <div class="rounded-2xl border border-slate-200 p-4">
+              <div class="aspect-[3/4] rounded-xl bg-vino-100 grid place-items-center">
+                <span class="font-serif text-xl">🍾</span>
+              </div>
+              <div class="mt-3 font-semibold">Bublinky měsíce</div>
+              <div class="text-sm text-slate-600">Crémant nebo Frizzante</div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 p-4">
+              <div class="aspect-[3/4] rounded-xl bg-vino-100 grid place-items-center">
+                <span class="font-serif text-xl">🍷</span>
+              </div>
+              <div class="mt-3 font-semibold">Červené překvapení</div>
+              <div class="text-sm text-slate-600">Frankovka / Pinot</div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 p-4">
+              <div class="aspect-[3/4] rounded-xl bg-vino-100 grid place-items-center">
+                <span class="font-serif text-xl">🥂</span>
+              </div>
+              <div class="mt-3 font-semibold">Bílé do páru</div>
+              <div class="text-sm text-slate-600">Ryzlink / Sauvignon</div>
+            </div>
+          </div>
+        </div>
+        <div class="absolute -z-10 -top-6 -left-6 w-32 h-32 rounded-3xl bg-vino-50 border border-vino-100"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter / Kontakt -->
+  <section id="newsletter" class="py-12 sm:py-16 lg:py-20 bg-slate-50 border-y border-slate-200">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <h2 class="font-serif text-3xl sm:text-4xl font-extrabold">Přihlas se k odběru</h2>
+        <p class="text-slate-700 mt-3">Novinky o vínech, akce a výběry klubu. Žádný spam, jen poctivý obsah o víně.</p>
+        <form id="newsletterForm" class="mt-5 grid sm:grid-cols-3 gap-3">
+          <input type="text" required placeholder="Jméno" class="sm:col-span-1 rounded-xl border-slate-300 focus:border-vino-700 focus:ring-vino-700 px-4 py-3" />
+          <input type="email" required placeholder="E‑mail" class="sm:col-span-1 rounded-xl border-slate-300 focus:border-vino-700 focus:ring-vino-700 px-4 py-3" />
+          <button class="sm:col-span-1 inline-flex items-center justify-center gap-2 rounded-xl bg-vino-700 text-white px-5 py-3 font-semibold hover:bg-vino-600" type="submit">
+            <i data-lucide="send"></i>
+            Odebírat
+          </button>
+        </form>
+        <p id="newsletterMsg" class="mt-3 text-sm text-green-700 hidden">Díky! Potvrzovací e‑mail je na cestě.</p>
+      </div>
+      <div id="kontakt" class="rounded-3xl border border-slate-200 p-6 bg-white shadow-soft">
+        <h3 class="font-serif text-2xl font-extrabold">Kontakt</h3>
+        <div class="mt-4 grid sm:grid-cols-2 gap-4 text-slate-700">
+          <div class="flex items-start gap-3"><i data-lucide="mail" class="w-5 h-5 text-vino-700 mt-0.5"></i><div><div class="font-semibold">E‑mail</div><a href="mailto:info@vinao.cz" class="text-vino-700 hover:underline">info@vinao.cz</a></div></div>
+          <div class="flex items-start gap-3"><i data-lucide="phone" class="w-5 h-5 text-vino-700 mt-0.5"></i><div><div class="font-semibold">Telefon</div><a href="tel:+420000000000" class="hover:underline">+420 000 000 000</a></div></div>
+          <div class="flex items-start gap-3"><i data-lucide="map-pin" class="w-5 h-5 text-vino-700 mt-0.5"></i><div><div class="font-semibold">Sídlo</div><div>Uherské Hradiště / Zlínský kraj</div></div></div>
+          <div class="flex items-start gap-3"><i data-lucide="clock" class="w-5 h-5 text-vino-700 mt-0.5"></i><div><div class="font-semibold">Dostupnost</div><div>Po–Pá 9:00–17:00</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <div class="font-extrabold text-lg">Vinao.cz</div>
+          <p class="text-slate-600 mt-2">Chuť Moravy v jedné lahvi. Katalog vín, vinařů a akce pro milovníky vína.</p>
+        </div>
+        <div>
+          <div class="font-semibold">Sekce</div>
+          <ul class="mt-2 space-y-2 text-slate-600">
+            <li><a class="hover:text-vino-700" href="#katalog">Katalog vín</a></li>
+            <li><a class="hover:text-vino-700" href="#vinari">Vinaři</a></li>
+            <li><a class="hover:text-vino-700" href="#akce">Akce</a></li>
+            <li><a class="hover:text-vino-700" href="#klub">Klub Vinao</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="font-semibold">Pro vinaře</div>
+          <ul class="mt-2 space-y-2 text-slate-600">
+            <li><a class="hover:text-vino-700" href="#kontakt">Přidat vinařství</a></li>
+            <li><a class="hover:text-vino-700" href="#kontakt">Inzerce & zvýraznění</a></li>
+            <li><a class="hover:text-vino-700" href="#kontakt">Spolupráce (Klub)</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="font-semibold">Právní</div>
+          <ul class="mt-2 space-y-2 text-slate-600">
+            <li><a class="hover:text-vino-700" href="#">Obchodní podmínky</a></li>
+            <li><a class="hover:text-vino-700" href="#">Ochrana osobních údajů</a></li>
+            <li><a class="hover:text-vino-700" href="#">Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-8 border-t border-slate-200 pt-6 text-sm text-slate-600 flex flex-wrap items-center justify-between gap-3">
+        <div>© <span id="year"></span> Vinao.cz • Všechna práva vyhrazena</div>
+        <div class="flex items-center gap-3">
+          <a href="#" class="hover:text-vino-700">Instagram</a>
+          <span class="opacity-40">•</span>
+          <a href="#" class="hover:text-vino-700">Facebook</a>
+          <span class="opacity-40">•</span>
+          <a href="#" class="hover:text-vino-700">YouTube</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] hidden">
+    <div class="rounded-xl bg-slate-900 text-white px-4 py-3 shadow-xl text-sm">Přidáno do košíku 🍷</div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Init icons
+    lucide.createIcons();
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobile menu logic (opens, closes on link click & backdrop)
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileBackdrop = document.getElementById('mobileBackdrop');
+    const mobileClose = document.getElementById('mobileClose');
+
+    function openMenu(){ mobileMenu.classList.remove('hidden'); hamburger.setAttribute('aria-expanded','true'); }
+    function closeMenu(){ mobileMenu.classList.add('hidden'); hamburger.setAttribute('aria-expanded','false'); }
+
+    hamburger.addEventListener('click', openMenu);
+    mobileClose.addEventListener('click', closeMenu);
+    mobileBackdrop.addEventListener('click', closeMenu);
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+
+    // Simple toast
+    const toast = document.getElementById('toast');
+    function showToast(msg='Přidáno do košíku 🍷'){
+      toast.firstElementChild.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(()=>toast.classList.add('hidden'), 1800);
+    }
+
+    // Demo data – vína
+    const wines = [
+      { id: 1, name: 'Ryzlink rýnský 2021', variety: 'Ryzlink rýnský', region: 'Mikulov', year: 2021, price: 249, style: 'suché', rating: 4.7 },
+      { id: 2, name: 'Sauvignon 2022', variety: 'Sauvignon', region: 'Znojmo', year: 2022, price: 289, style: 'polosuché', rating: 4.5 },
+      { id: 3, name: 'Frankovka 2020', variety: 'Frankovka', region: 'Velké Pavlovice', year: 2020, price: 219, style: 'suché', rating: 4.3 },
+      { id: 4, name: 'Rulandské modré 2019', variety: 'Rulandské modré', region: 'Slovácko', year: 2019, price: 329, style: 'suché', rating: 4.6 },
+      { id: 5, name: 'Veltlínské zelené 2023', variety: 'Veltlínské zelené', region: 'Znojmo', year: 2023, price: 199, style: 'polosuché', rating: 4.1 },
+      { id: 6, name: 'Cuvée Rosé 2022', variety: 'Rulandské modré', region: 'Mikulov', year: 2022, price: 259, style: 'polosladké', rating: 4.2 },
+      { id: 7, name: 'Ryzlink rýnský 2018 Reserva', variety: 'Ryzlink rýnský', region: 'Mikulov', year: 2018, price: 449, style: 'suché', rating: 4.8 },
+      { id: 8, name: 'Sauvignon 2021 Terroir', variety: 'Sauvignon', region: 'Znojmo', year: 2021, price: 339, style: 'suché', rating: 4.6 }
+    ];
+
+    const wineGrid = document.getElementById('wineGrid');
+
+    function wineCard(w){
+      return `
+        <article class="rounded-2xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+          <div class="aspect-[4/3] bg-gradient-to-b from-vino-100 to-white grid place-items-center">
+            <svg viewBox='0 0 128 256' class='w-16 h-28' aria-hidden='true'>
+              <defs><linearGradient id='g${w.id}' x1='0' x2='0' y1='0' y2='1'><stop offset='0%' stop-color='#9b1438'/><stop offset='100%' stop-color='#7b0323'/></linearGradient></defs>
+              <rect x='56' y='0' width='16' height='30' fill='#333' rx='4'/>
+              <rect x='44' y='30' width='40' height='110' fill='url(#g${w.id})' rx='8'/>
+              <rect x='40' y='140' width='48' height='80' fill='#eee' rx='10' stroke='#ddd'/>
+            </svg>
+          </div>
+          <div class="p-4 flex-1 flex flex-col">
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="font-semibold leading-snug">${w.name}</h3>
+              <span class="text-sm text-vino-700 font-semibold">${w.year}</span>
+            </div>
+            <div class="mt-1 text-sm text-slate-600">${w.variety} • ${w.region} • ${w.style}</div>
+            <div class="mt-2 flex items-center gap-1 text-amber-500" aria-label="Hodnocení ${w.rating}">
+              ${'★'.repeat(Math.round(w.rating))}${'☆'.repeat(5-Math.round(w.rating))}
+              <span class="ml-2 text-xs text-slate-500">${w.rating.toFixed(1)}</span>
+            </div>
+            <div class="mt-auto pt-3 flex items-center justify-between">
+              <div class="font-extrabold text-lg">${w.price} Kč</div>
+              <button class="inline-flex items-center gap-2 rounded-xl bg-vino-700 text-white px-3 py-2 text-sm hover:bg-vino-600" data-add='${w.id}'>
+                <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                Do košíku
+              </button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderWines(list){
+      wineGrid.innerHTML = list.map(wineCard).join('');
+      lucide.createIcons();
+      wineGrid.querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click', ()=>showToast()));
+    }
+
+    renderWines(wines);
+
+    // Filtry – jednoduché klientské filtrovaní demo dat
+    const fq = document.getElementById('f-q');
+    const fO = document.getElementById('f-odruda');
+    const fR = document.getElementById('f-region');
+    const fC = document.getElementById('f-cena');
+    const fY = document.getElementById('f-rocnik');
+    const resetBtn = document.getElementById('resetFilters');
+
+    function applyFilters(){
+      const q = fq.value.trim().toLowerCase();
+      const o = fO.value;
+      const r = fR.value;
+      const c = parseFloat(fC.value);
+      const y = parseInt(fY.value, 10);
+      const filtered = wines.filter(w => {
+        if (q && !(w.name.toLowerCase().includes(q) || w.variety.toLowerCase().includes(q) || w.region.toLowerCase().includes(q))) return false;
+        if (o && w.variety !== o) return false;
+        if (r && w.region !== r) return false;
+        if (!isNaN(c) && w.price > c) return false;
+        if (!isNaN(y) && w.year < y) return false;
+        return true;
+      });
+      renderWines(filtered);
+    }
+
+    [fq, fO, fR, fC, fY].forEach(el => el.addEventListener('input', applyFilters));
+    resetBtn.addEventListener('click', () => { fq.value = ''; fO.value=''; fR.value=''; fC.value=''; fY.value=''; applyFilters(); });
+
+    // Vinaři – demo data
+    const wineries = [
+      { name: 'Vinařství Slovácko', region: 'Slovácko', focus: 'Rulandské, Frankovka', since: 1998 },
+      { name: 'Rodinné vinařství Mikulov', region: 'Mikulov', focus: 'Ryzlink, Sauvignon', since: 2005 },
+      { name: 'Znojemský sklep', region: 'Znojmo', focus: 'Veltlín, Sauvignon', since: 2012 },
+      { name: 'Vinice Pavlovice', region: 'Velké Pavlovice', focus: 'Pinot Noir, Rosé', since: 1995 },
+      { name: 'U Modrého hroznu', region: 'Mikulov', focus: 'Rulandská řada', since: 1987 },
+      { name: 'Terroir Morava', region: 'Znojmo', focus: 'Single-vineyard série', since: 2018 }
+    ];
+
+    const wineryGrid = document.getElementById('wineryGrid');
+    function wineryCard(w){
+      return `
+        <article class='rounded-2xl border border-slate-200 bg-white p-5 flex flex-col'>
+          <div class='flex items-start justify-between gap-3'>
+            <h3 class='font-semibold'>${w.name}</h3>
+            <span class='text-xs rounded-full bg-vino-50 text-vino-700 px-2 py-1 border border-vino-100'>${w.region}</span>
+          </div>
+          <div class='mt-1 text-sm text-slate-600'>Specializace: ${w.focus}</div>
+          <div class='mt-2 text-xs text-slate-500'>Založeno: ${w.since}</div>
+          <div class='mt-4 flex items-center gap-3'>
+            <a href='#kontakt' class='inline-flex items-center gap-2 rounded-xl border border-slate-300 px-3 py-2 text-sm hover:border-vino-700 hover:text-vino-700'>Kontaktovat</a>
+            <a href='#katalog' class='text-sm text-vino-700 hover:underline'>Zobrazit vína</a>
+          </div>
+        </article>
+      `;
+    }
+    wineryGrid.innerHTML = wineries.map(wineryCard).join('');
+
+    // Akce – demo data
+    const events = [
+      { date: '2025-11-15', title: 'Otevřené sklepy – Mikulov', place: 'Mikulov', type: 'degustace' },
+      { date: '2025-12-05', title: 'Adventní degustace s párováním', place: 'Zlín', type: 'párování' },
+      { date: '2026-01-20', title: 'Festival mladých vín', place: 'Brno', type: 'festival' },
+      { date: '2026-02-10', title: 'Moravský večer – Frankovky', place: 'Uherské Hradiště', type: 'degustace' },
+      { date: '2026-03-08', title: 'Tour po vinicích – Znojmo', place: 'Znojmo', type: 'tour' },
+      { date: '2026-04-18', title: 'Jarní vinný trh', place: 'Velké Pavlovice', type: 'trh' }
+    ];
+
+    const eventList = document.getElementById('eventList');
+    function fmtDate(d){
+      const dt = new Date(d);
+      return dt.toLocaleDateString('cs-CZ', { day:'2-digit', month:'2-digit', year:'numeric' });
+    }
+    function badgeType(t){
+      const map = { degustace:'Degustace', párování:'Párování', festival:'Festival', tour:'Tour', trh:'Trh' };
+      return map[t] || 'Akce';
+    }
+    function eventCard(e){
+      return `
+        <article class='rounded-2xl border border-slate-200 bg-white p-5 flex flex-col'>
+          <div class='flex items-start justify-between gap-3'>
+            <h3 class='font-semibold leading-snug'>${e.title}</h3>
+            <span class='text-xs rounded-full bg-vino-50 text-vino-700 px-2 py-1 border border-vino-100'>${badgeType(e.type)}</span>
+          </div>
+          <div class='mt-1 text-sm text-slate-600 flex items-center gap-3'>
+            <span class='inline-flex items-center gap-1'><i data-lucide="calendar" class='w-4 h-4 text-vino-700'></i>${fmtDate(e.date)}</span>
+            <span class='inline-flex items-center gap-1'><i data-lucide="map-pin" class='w-4 h-4 text-vino-700'></i>${e.place}</span>
+          </div>
+          <div class='mt-4 flex items-center gap-3'>
+            <a href='#kontakt' class='inline-flex items-center gap-2 rounded-xl border border-slate-300 px-3 py-2 text-sm hover:border-vino-700 hover:text-vino-700'>Mám zájem</a>
+            <a href='#katalog' class='text-sm text-vino-700 hover:underline'>Více o vínech</a>
+          </div>
+        </article>
+      `;
+    }
+    eventList.innerHTML = events.map(eventCard).join('');
+    lucide.createIcons();
+
+    // Newsletter fake submit
+    document.getElementById('newsletterForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      document.getElementById('newsletterMsg').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
