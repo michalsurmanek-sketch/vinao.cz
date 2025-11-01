@@ -103,8 +103,11 @@
       <div class="absolute inset-0 bg-black/40" id="mobileBackdrop"></div>
       <nav class="absolute right-0 top-0 h-full w-[82%] max-w-sm bg-white shadow-2xl p-6 flex flex-col gap-4">
         <div class="flex items-center justify-between mb-2">
-          <div class="font-extrabold text-lg">Menu</div>
-          <button id="mobileClose" class="w-9 h-9 grid place-items-center rounded-lg border border-slate-300" aria-label="Zavřít menu">
+          <a href="#home" class="flex items-center gap-3">
+            <div class="w-9 h-9 grid place-items-center rounded-lg bg-vino-700 text-white">V</div>
+            <span class="font-medium">Vinao</span>
+          </a>
+          <button id="mobileClose" class="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-200 hover:border-vino-700" aria-label="Zavřít menu">
             <i data-lucide="x"></i>
           </button>
         </div>
@@ -400,19 +403,41 @@
     // Year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Mobile menu logic (opens, closes on link click & backdrop)
+    // Mobile menu logic (opens, closes on link click & backdrop + ESC + lock scroll)
     const hamburger = document.getElementById('hamburger');
     const mobileMenu = document.getElementById('mobileMenu');
     const mobileBackdrop = document.getElementById('mobileBackdrop');
     const mobileClose = document.getElementById('mobileClose');
 
-    function openMenu(){ mobileMenu.classList.remove('hidden'); hamburger.setAttribute('aria-expanded','true'); }
-    function closeMenu(){ mobileMenu.classList.add('hidden'); hamburger.setAttribute('aria-expanded','false'); }
+    function lockScroll(){ document.documentElement.style.overflow = 'hidden'; document.body.style.touchAction = 'none'; }
+    function unlockScroll(){ document.documentElement.style.overflow = ''; document.body.style.touchAction = ''; }
 
-    hamburger.addEventListener('click', openMenu);
-    mobileClose.addEventListener('click', closeMenu);
-    mobileBackdrop.addEventListener('click', closeMenu);
-    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    function openMenu(){
+      if(!mobileMenu) return;
+      mobileMenu.classList.remove('hidden');
+      hamburger?.setAttribute('aria-expanded','true');
+      lockScroll();
+      lucide.createIcons(); // ensure icons inside menu render
+    }
+    function closeMenu(){
+      if(!mobileMenu) return;
+      mobileMenu.classList.add('hidden');
+      hamburger?.setAttribute('aria-expanded','false');
+      unlockScroll();
+    }
+
+    hamburger?.addEventListener('click', ()=> {
+      if (!mobileMenu) return;
+      if (mobileMenu.classList.contains('hidden')) openMenu(); else closeMenu();
+    });
+    mobileClose?.addEventListener('click', closeMenu);
+    mobileBackdrop?.addEventListener('click', closeMenu);
+    mobileMenu?.querySelectorAll('a')?.forEach(a => a.addEventListener('click', closeMenu));
+
+    // ESC = close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu && !mobileMenu.classList.contains('hidden')) closeMenu();
+    });
 
     // Simple toast
     const toast = document.getElementById('toast');
